@@ -6,6 +6,7 @@ Created on Sun Nov 25 12:50:23 2018
 """
 
 import numpy as np
+import pandas as pd
 
 
 def avg_standardize(v):
@@ -15,15 +16,16 @@ def avg_standardize(v):
     Dependency
     ----------
     numPy
+    pandas
 
     Parameters
     ----------
-    values: list numeric values or tuple of numeric values
+    values: list numeric values, tuple of numeric values, pandas series
         a list of numbers.
 
     Returns
     -------
-    result: list numeric, numeric
+    result: numpy array numeric, numeric
         A list of numbers divided by their mean.
         The average value for the original list of values.
 
@@ -33,18 +35,17 @@ def avg_standardize(v):
     >>> avg_standardize(v)
         [0.66666, 1.33333], 7.5
     """
-    if type(v) not in (list, tuple):
+    if isinstance(v, (list, tuple, pd.core.series.Series)):
+        v = np.array(v)
+        try:
+            avg = np.average(v)
+            output = v / avg
+            return output, avg
+        except TypeError:
+            print("The data provided is not appropriate. Double check you input.")
+            return None
+    else:
         print("The type of object provided is not correct.")
-        return None
-    try:
-        avg = np.average(v)
-        if type(v) is tuple:
-            output = tuple(v / avg)
-        else:
-            output = list(v / avg)
-        return output, avg
-    except TypeError:
-        print("The data provided is not appropriate. Double check you input.")
         return None
 
 
@@ -54,15 +55,16 @@ def max_standardize(v):
 
     Dependency
     ----------
+    pandas
 
     Parameters
     ----------
-    values: list numeric values or tuple of numeric values
+    values: list numeric values, tuple or pandas series of numeric values
         a list of numbers.
 
     Returns
     -------
-    result: list numeric, numeric
+    result: numpy array numeric, numeric
         A list of numbers divided by their maximum.
         The maximum value for the original list of values.
 
@@ -72,18 +74,17 @@ def max_standardize(v):
     >>> max_standardize(v)
         [0.5, 1.0], 10
     """
-    if type(v) not in (list, tuple):
+    if isinstance(v, (list, tuple, pd.core.series.Series)):
+        v = np.array(v)
+        try:
+            mx = max(v)
+            output = v / mx
+            return output, mx
+        except TypeError:
+            print("The data provided is not appropriate. Double check you input.")
+            return None
+    else:
         print("The type of object provided is not correct.")
-        return None
-    try:
-        mx = max(v)
-        if type(v) is tuple:
-            output = tuple([i / mx for i in v])
-        else:
-            output = [i / mx for i in v]
-        return output, mx
-    except TypeError:
-        print("The data provided is not appropriate. Double check you input.")
         return None
 
 
@@ -93,15 +94,16 @@ def sum_standardize(v):
 
     Dependency
     ----------
+    pandas
 
     Parameters
     ----------
-    values: list numeric values or tuple of numeric values
+    values: list numeric values, tuple or pandas series of numeric values
         a list of numbers.
 
     Returns
     -------
-    result: list numeric, numeric
+    result: numpy array numeric, numeric
         A list of numbers divided by their sum.
         The sum for the original list of values.
 
@@ -111,18 +113,17 @@ def sum_standardize(v):
     >>> sum_standardize(v)
         [0.33333, 0.66666], 15
     """
-    if type(v) not in (list, tuple):
+    if isinstance(v, (list, tuple, pd.core.series.Series)):
+        v = np.array(v)
+        try:
+            sm = sum(v)
+            output = v / sm
+            return output, sm
+        except TypeError:
+            print("The data provided is not appropriate. Double check you input.")
+            return None
+    else:
         print("The type of object provided is not correct.")
-        return None
-    try:
-        sm = np.float(sum(v))
-        if type(v) is tuple:
-            output = tuple([i / sm for i in v])
-        else:
-            output = [i / sm for i in v]
-        return output, sm
-    except TypeError:
-        print("The data provided is not appropriate. Double check you input.")
         return None
 
 
@@ -133,15 +134,16 @@ def zsc_standardize(v):
     Dependency
     ----------
     numPy
+    pandas
 
     Parameters
     ----------
-    values: list numeric values or tuple of numeric values
+    values: list numeric values, tuple or pandas series of numeric values
         a list of numbers.
 
     Returns
     -------
-    result: list numeric, numeric, numeric
+    result: numpy array numeric, numeric, numeric
         A list of numbers z-scored.
         The average value for the original list of values.
         The standard deviation for the original list of values.
@@ -152,19 +154,18 @@ def zsc_standardize(v):
     >>> zsc_standardize(v)
         [-1, 1], 7.5, 2.5
     """
-    if type(v) not in (list, tuple):
+    if isinstance(v, (list, tuple, pd.core.series.Series)):
+        v = np.array(v)
+        try:
+            avg = np.average(v)
+            std = np.std(v)
+            output = (v - avg) / std
+            return output, avg, std
+        except TypeError:
+            print("The data provided is not appropriate. Double check you input.")
+            return None
+    else:
         print("The type of object provided is not correct.")
-        return None
-    try:
-        avg = np.average(v)
-        std = np.std(v)
-        if type(v) is tuple:
-            output = tuple((v - avg) / std)
-        else:
-            output = list((v - avg) / std)
-        return output, avg, std
-    except TypeError:
-        print("The data provided is not appropriate. Double check you input.")
         return None
 
 
@@ -175,6 +176,7 @@ def all_standardize(v, t):
     Dependency
     ----------
     numPy
+    pandas
     avg_standardize()
     max_standardize()
     sum_standardize()
@@ -182,7 +184,7 @@ def all_standardize(v, t):
 
     Parameters
     ----------
-    values: list numeric values or tuple of numeric values, type of standardization to use
+    values: list numeric values, tuple or pandas series of numeric values, type of standardization to use
         v - A list or tuple of numbers
         t - One of "a", "m", "s", "z"
         a = average standardization - avg_standardize()
@@ -192,7 +194,7 @@ def all_standardize(v, t):
 
     Returns
     -------
-    result: list numeric, numeric, numeric
+    result: numpy array numeric, numeric, numeric
         A list of numbers standardized.
         The average, maximum or sum value for the original list of values.
         The standard deviation for the original list of values.
@@ -215,46 +217,86 @@ def all_standardize(v, t):
         return None
     if t == "a":
         return avg_standardize(v)
-    elif t == "m":
+    if t == "m":
         return max_standardize(v)
-    elif t == "s":
+    if t == "s":
         return sum_standardize(v)
-    elif t == "z":
+    if t == "z":
         return zsc_standardize(v)
-    else:
-        print("Something went wrong. Check your inputs. See help for details.")
-        return None
+    print("Something went wrong. Check your inputs. See help for details.")
+    return None
 
 
 """
 # test cases
 v = [5, 10]
 q = (5, 10)
+i = range(1,1000001)
+a,b,c = map(np.random.normal, (100, 50, 25), (20, 10, 5), ([1000000] * 3))
+data = pd.DataFrame({"var1": a, "var2": b, "var3": c}, index = i)
 
 # run tests
 print("Run avg_standardize(v) and avg_standardize(q)")
 print(str(avg_standardize(v)))
 print(str(avg_standardize(q)))
+
 print("Run max_standardize(v) and max_standardize(q)")
 print(str(max_standardize(v)))
 print(str(max_standardize(q)))
+
 print("Run sum_standardize(v) and sum_standardize(q)")
 print(str(sum_standardize(v)))
 print(str(sum_standardize(q)))
+
 print("Run zsc_standardize(v) and zsc_standardize(q)")
 print(str(zsc_standardize(v)))
 print(str(zsc_standardize(q)))
+
 print("Run all_standardize(v, ) and all_standardize(q, )")
 print("---- average ----")
 print(str(all_standardize(v, "a")))
 print(str(all_standardize(q, "a")))
+
 print("---- maximum ----")
 print(str(all_standardize(v, "m")))
 print(str(all_standardize(q, "m")))
+
 print("---- sum ----")
 print(str(all_standardize(v, "s")))
 print(str(all_standardize(q, "s")))
+
 print("---- z-score ----")
 print(str(all_standardize(v, "z")))
 print(str(all_standardize(q, "z")))
+
+# run pandas test
+data_stand = pd.DataFrame()
+
+print("---- average pandas ----")
+z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['a']*3)))
+data_stand["var1"] = z[0][0]
+data_stand["var2"] = z[1][0]
+data_stand["var3"] = z[2][0]
+data_stand.describe()
+
+print("---- max pandas ----")
+z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['m']*3)))
+data_stand["var1"] = z[0][0]
+data_stand["var2"] = z[1][0]
+data_stand["var3"] = z[2][0]
+data_stand.describe()
+
+print("---- sum pandas ----")
+z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['s']*3)))
+data_stand["var1"] = z[0][0]
+data_stand["var2"] = z[1][0]
+data_stand["var3"] = z[2][0]
+data_stand.describe()
+
+print("---- z-score pandas ----")
+z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['z']*3)))
+data_stand["var1"] = z[0][0]
+data_stand["var2"] = z[1][0]
+data_stand["var3"] = z[2][0]
+data_stand.describe()
 """
