@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-def avg_standardize(v):
+def avg_standardize(vector_of_values):
     """
     Return the list values divided by the average value.
 
@@ -31,15 +31,15 @@ def avg_standardize(v):
 
     Example
     -------
-    v = [5, 10]
-    >>> avg_standardize(v)
+    values = [5, 10]
+    >>> avg_standardize(values)
         [0.66666, 1.33333], 7.5
     """
-    if isinstance(v, (list, tuple, pd.core.series.Series)):
-        v = np.array(v)
+    if isinstance(vector_of_values, (list, tuple, pd.core.series.Series)):
+        vector_of_values = np.array(vector_of_values)
         try:
-            avg = np.average(v)
-            output = v / avg
+            avg = np.average(vector_of_values)
+            output = vector_of_values / avg
             return output, avg
         except TypeError:
             print("The data provided is not appropriate. Double check you input.")
@@ -49,7 +49,7 @@ def avg_standardize(v):
         return None
 
 
-def max_standardize(v):
+def max_standardize(vector_of_values):
     """
     Return the list values divided by the maximum value.
 
@@ -70,16 +70,16 @@ def max_standardize(v):
 
     Example
     -------
-    v = [5, 10]
-    >>> max_standardize(v)
+    values = [5, 10]
+    >>> max_standardize(values)
         [0.5, 1.0], 10
     """
-    if isinstance(v, (list, tuple, pd.core.series.Series)):
-        v = np.array(v)
+    if isinstance(vector_of_values, (list, tuple, pd.core.series.Series)):
+        vector_of_values = np.array(vector_of_values)
         try:
-            mx = max(v)
-            output = v / mx
-            return output, mx
+            max_value = max(vector_of_values)
+            output = vector_of_values / max_value
+            return output, max_value
         except TypeError:
             print("The data provided is not appropriate. Double check you input.")
             return None
@@ -88,7 +88,7 @@ def max_standardize(v):
         return None
 
 
-def sum_standardize(v):
+def sum_standardize(vector_of_values):
     """
     Return the list values divided by the sum of all value.
 
@@ -109,16 +109,16 @@ def sum_standardize(v):
 
     Example
     -------
-    v = [5, 10]
-    >>> sum_standardize(v)
+    values = [5, 10]
+    >>> sum_standardize(values)
         [0.33333, 0.66666], 15
     """
-    if isinstance(v, (list, tuple, pd.core.series.Series)):
-        v = np.array(v)
+    if isinstance(vector_of_values, (list, tuple, pd.core.series.Series)):
+        vector_of_values = np.array(vector_of_values)
         try:
-            sm = sum(v)
-            output = v / sm
-            return output, sm
+            sum_values = sum(vector_of_values)
+            output = vector_of_values / sum_values
+            return output, sum_values
         except TypeError:
             print("The data provided is not appropriate. Double check you input.")
             return None
@@ -127,7 +127,7 @@ def sum_standardize(v):
         return None
 
 
-def zsc_standardize(v):
+def zsc_standardize(vector_of_values):
     """
     Return the list values z-scored (value - avg) / stdev.
 
@@ -150,17 +150,17 @@ def zsc_standardize(v):
 
     Example
     -------
-    v = [5, 10]
-    >>> zsc_standardize(v)
+    values = [5, 10]
+    >>> zsc_standardize(values)
         [-1, 1], 7.5, 2.5
     """
-    if isinstance(v, (list, tuple, pd.core.series.Series)):
-        v = np.array(v)
+    if isinstance(vector_of_values, (list, tuple, pd.core.series.Series)):
+        vector_of_values = np.array(vector_of_values)
         try:
-            avg = np.average(v)
-            std = np.std(v)
-            output = (v - avg) / std
-            return output, avg, std
+            avg = np.average(vector_of_values)
+            stdev = np.std(vector_of_values)
+            output = (vector_of_values - avg) / stdev
+            return output, avg, stdev
         except TypeError:
             print("The data provided is not appropriate. Double check you input.")
             return None
@@ -169,7 +169,7 @@ def zsc_standardize(v):
         return None
 
 
-def all_standardize(v, t):
+def all_standardize(vector_of_values, standardization_type):
     """
     Return the list values standardized based on method chosen.
 
@@ -184,13 +184,14 @@ def all_standardize(v, t):
 
     Parameters
     ----------
-    values: list numeric values, tuple or pandas series of numeric values, type of standardization to use
-        v - A list or tuple of numbers
-        t - One of "a", "m", "s", "z"
-        a = average standardization - avg_standardize()
-        m = max standardization     - max_standardize()
-        s = sum standardization     - sum_standardize()
-        z = z-score standardization - zsc_standardize()
+    values: list numeric values, tuple or pandas series of numeric values,
+    type of standardization to use
+        values - A list or tuple of numbers
+        standardization_type - One of "a", "m", "s", "z"
+            a = average standardization - avg_standardize()
+            m = max standardization     - max_standardize()
+            s = sum standardization     - sum_standardize()
+            z = z-score standardization - zsc_standardize()
 
     Returns
     -------
@@ -202,27 +203,27 @@ def all_standardize(v, t):
 
     Example
     -------
-    v = [5, 10]
-    >>> all_standardize(v, "a")
+    values = [5, 10]
+    >>> all_standardize(vector_of_values, "a")
         [0.66666, 1.33333], 7.5
-    >>> all_standardize(v, "m")
+    >>> all_standardize(vector_of_values, "m")
         [0.5, 1.0], 10
-    >>> all_standardize(v, "s")
+    >>> all_standardize(vector_of_values, "s")
         [0.33333, 0.66666], 15
-    >>> all_standardize(v, "z")
+    >>> all_standardize(vector_of_values, "z")
         [-1, 1], 7.5, 2.5
     """
-    if t not in ("a", "m", "s", "z"):
+    if standardization_type not in ("a", "m", "s", "z"):
         print("The t parameter has to be one of 'a', 'm', 's', 'z'. See help for details")
         return None
-    if t == "a":
-        return avg_standardize(v)
-    if t == "m":
-        return max_standardize(v)
-    if t == "s":
-        return sum_standardize(v)
-    if t == "z":
-        return zsc_standardize(v)
+    if standardization_type == "a":
+        return avg_standardize(vector_of_values)
+    if standardization_type == "m":
+        return max_standardize(vector_of_values)
+    if standardization_type == "s":
+        return sum_standardize(vector_of_values)
+    if standardization_type == "z":
+        return zsc_standardize(vector_of_values)
     print("Something went wrong. Check your inputs. See help for details.")
     return None
 
