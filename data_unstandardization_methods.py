@@ -21,7 +21,8 @@ def un_standardize(vector_of_values, standard_value):
 
     Parameters
     ----------
-    values: list numeric values, tuple of numeric values, pandas series, numpy array
+    values: list numeric values, tuple of numeric values, pandas series,
+    numpy array
         a list of numbers.
 
     Returns
@@ -98,7 +99,7 @@ def un_zsc_standardize(vector_of_values, avg, stdev):
         return None
 
 
-def all_un_standardize(vector_of_values, standardization_type, **kwargs):
+def un_all_standardize(vector_of_values, standardization_type, standardization_dic):
     """
     Return the list values de-standardized based on method chosen.
 
@@ -106,10 +107,8 @@ def all_un_standardize(vector_of_values, standardization_type, **kwargs):
     ----------
     numPy
     pandas
-    avg_standardize()
-    max_standardize()
-    sum_standardize()
-    zsc_standardize()
+    un_standardize()
+    un_zsc_standardize()
 
     Parameters
     ----------
@@ -117,11 +116,11 @@ def all_un_standardize(vector_of_values, standardization_type, **kwargs):
     numpy array; type of standardization to use; standardization parameters
         values - A list or tuple of numbers
         standardization_type - One of "a", "m", "s", "z"
-            a = average standardization - avg_standardize()
-            m = max standardization     - max_standardize()
-            s = sum standardization     - sum_standardize()
-            z = z-score standardization - zsc_standardize()
-        kwargs - {"avg": #, "max": #, "sum": #, "std": #}
+            a = average standardization - un_standardize()
+            m = max standardization     - un_standardize()
+            s = sum standardization     - un_standardize()
+            z = z-score standardization - un_zsc_standardize()
+        standardization_dic - {"avg": #, "max": #, "sum": #, "std": #}
 
     Returns
     -------
@@ -148,17 +147,33 @@ def all_un_standardize(vector_of_values, standardization_type, **kwargs):
         print("The t parameter has to be one of 'a', 'm', 's', 'z'. See help for details")
         return None
     if standardization_type == "a":
-        avg = kwargs['avg']
+        try:
+            avg = standardization_dic['avg']
+        except KeyError:
+            print("The standardization_dic expects a {'avg': #} check you parameters")
+            return None
         return un_standardize(vector_of_values, avg)
     if standardization_type == "m":
-        mxm = kwargs['max']
+        try:
+            mxm = standardization_dic['max']
+        except KeyError:
+            print("The standardization_dic expects a {'max': #} check you parameters")
+            return None
         return un_standardize(vector_of_values, mxm)
     if standardization_type == "s":
-        smv = kwargs['sum']
+        try:
+            smv = standardization_dic['sum']
+        except KeyError:
+            print("The standardization_dic expects a {'sum': #} check you parameters")
+            return None
         return un_standardize(vector_of_values, smv)
     if standardization_type == "z":
-        avg = kwargs['avg']
-        std = kwargs['std']
+        try:
+            avg = standardization_dic['avg']
+            std = standardization_dic['std']
+        except KeyError:
+            print("The standardization_dic expects a {'avg': #, 'std': #} check you parameters")
+            return None
         return un_zsc_standardize(vector_of_values, avg, std)
     print("Something went wrong. Check your inputs. See help for details.")
     return None
@@ -166,74 +181,48 @@ def all_un_standardize(vector_of_values, standardization_type, **kwargs):
 
 """
 # test cases
-v = [5, 10]
-q = (5, 10)
-i = range(1,1000001)
-a,b,c = map(np.random.normal, (100, 50, 25), (20, 10, 5), ([1000000] * 3))
-data = pd.DataFrame({"var1": a, "var2": b, "var3": c}, index = i)
+runfile('C:/Users/Sean Howard/Documents/Python/py_utilities/data_standardization_methods.py', wdir='C:/Users/Sean Howard/Documents/Python/py_utilities')
 
-# run tests
-print("Run avg_standardize(v) and avg_standardize(q)")
-print(str(avg_standardize(v)))
-print(str(avg_standardize(q)))
+i = range(1,101)
 
-print("Run max_standardize(v) and max_standardize(q)")
-print(str(max_standardize(v)))
-print(str(max_standardize(q)))
+a,b,c,d = map(
+np.random.normal,
+(100, 50, 25, 5),
+(20, 10, 5, 1),
+(100,100,100,100))
 
-print("Run sum_standardize(v) and sum_standardize(q)")
-print(str(sum_standardize(v)))
-print(str(sum_standardize(q)))
+data = pd.DataFrame({"var1": a, "var2": b, "var3": c, "var4": d}, index = i)
 
-print("Run zsc_standardize(v) and zsc_standardize(q)")
-print(str(zsc_standardize(v)))
-print(str(zsc_standardize(q)))
+# standardize values
+stand_out = list(map(
+    all_standardize,
+    (data.var1, data.var2, data.var3, data.var4),
+    ('a', 'm', 's', 'z')))
 
-print("Run all_standardize(v, ) and all_standardize(q, )")
-print("---- average ----")
-print(str(all_standardize(v, "a")))
-print(str(all_standardize(q, "a")))
-
-print("---- maximum ----")
-print(str(all_standardize(v, "m")))
-print(str(all_standardize(q, "m")))
-
-print("---- sum ----")
-print(str(all_standardize(v, "s")))
-print(str(all_standardize(q, "s")))
-
-print("---- z-score ----")
-print(str(all_standardize(v, "z")))
-print(str(all_standardize(q, "z")))
-
-# run pandas test
+# put standardize values into a data frame
 data_stand = pd.DataFrame()
+data_stand["var1"] = stand_out[0][0]
+data_stand["var2"] = stand_out[1][0]
+data_stand["var3"] = stand_out[2][0]
+data_stand["var4"] = stand_out[3][0]
 
-print("---- average pandas ----")
-z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['a']*3)))
-data_stand["var1"] = z[0][0]
-data_stand["var2"] = z[1][0]
-data_stand["var3"] = z[2][0]
-data_stand.describe()
+var1_stnd = {'avg': stand_out[0][1]}
+var2_stnd = {'max': stand_out[1][1]}
+var3_stnd = {'sum': stand_out[2][1]}
+var4_stnd = {'avg': stand_out[3][1], 'std': stand_out[3][2]}
 
-print("---- max pandas ----")
-z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['m']*3)))
-data_stand["var1"] = z[0][0]
-data_stand["var2"] = z[1][0]
-data_stand["var3"] = z[2][0]
-data_stand.describe()
+# unstandardize the data
+data_unstand = pd.DataFrame()
 
-print("---- sum pandas ----")
-z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['s']*3)))
-data_stand["var1"] = z[0][0]
-data_stand["var2"] = z[1][0]
-data_stand["var3"] = z[2][0]
-data_stand.describe()
+unstand_out = list(map(
+    un_all_standardize,
+    (data_stand.var1, data_stand.var2, data_stand.var3, data_stand.var4),
+    ('a', 'm', 's', 'z'),
+    (var1_stnd, var2_stnd, var3_stnd, var4_stnd)))
 
-print("---- z-score pandas ----")
-z = list(map(all_standardize, (data.var1, data.var2, data.var3), (['z']*3)))
-data_stand["var1"] = z[0][0]
-data_stand["var2"] = z[1][0]
-data_stand["var3"] = z[2][0]
-data_stand.describe()
+data_unstand["var1"] = unstand_out[0]
+data_unstand["var2"] = unstand_out[1]
+data_unstand["var3"] = unstand_out[2]
+data_unstand["var4"] = unstand_out[3]
+
 """
