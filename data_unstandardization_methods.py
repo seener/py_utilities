@@ -181,9 +181,9 @@ def un_all_standardize(vector_of_values, standardization_type, standardization_d
 
 """
 # test cases
-runfile('C:/Users/Sean Howard/Documents/Python/py_utilities/data_standardization_methods.py', wdir='C:/Users/Sean Howard/Documents/Python/py_utilities')
+runfile('./data_standardization_methods.py')
 
-i = range(1,101)
+i = range(0,100)
 
 a,b,c,d = map(
 np.random.normal,
@@ -225,4 +225,8 @@ data_unstand["var2"] = unstand_out[1]
 data_unstand["var3"] = unstand_out[2]
 data_unstand["var4"] = unstand_out[3]
 
+#compare unstandardized results to original values - should return 0
+round(sum(abs(data_unstand.var1 - data.var1)), 6)
+round(sum(abs(data_unstand.var2 - data.var2)), 6)
+round(sum(abs(data_unstand.var3 - data.var3)), 6)
 """
